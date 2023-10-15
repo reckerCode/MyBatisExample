@@ -1,0 +1,46 @@
+package com.example.sevice.batis.config;
+
+import com.example.sevice.batis.service.intr.AddressMapper;
+import com.example.sevice.batis.service.intr.PersonMapper;
+import org.apache.ibatis.datasource.pooled.PooledDataSource;
+import org.apache.ibatis.jdbc.SQL;
+import org.apache.ibatis.mapping.Environment;
+import org.apache.ibatis.session.Configuration;
+import org.apache.ibatis.session.SqlSessionFactory;
+import org.apache.ibatis.session.SqlSessionFactoryBuilder;
+import org.apache.ibatis.transaction.jdbc.JdbcTransactionFactory;
+
+import javax.sql.DataSource;
+
+public class SqlConfig {
+    public static final String DRIVER = "org.apache.derby.jdbc.EmbeddedDriver";
+    public static final String URL = "jdbc:derby:testdb1;create=true";
+    public static final String USERNAME = "sa";
+    public static final String PASSWORD = "pass123";
+    private static SqlSessionFactory sqlSessionFactory;
+
+    public static SqlSessionFactory buildqlSessionFactory() {
+        DataSource dataSource = new PooledDataSource(DRIVER, URL, USERNAME, PASSWORD);
+        Environment environment = new Environment("Development", new JdbcTransactionFactory(), dataSource);
+        Configuration configuration = new Configuration(environment);
+        configuration.addMapper(PersonMapper.class);
+        configuration.addMapper(AddressMapper.class);
+        SqlSessionFactoryBuilder builder = new SqlSessionFactoryBuilder();
+        return builder.build(configuration);
+
+    }
+
+    public static SqlSessionFactory getSqlSessionFactory() {
+        return sqlSessionFactory;
+    }
+
+    public String getPersonByName(String name) {
+        return new SQL() {
+            {
+                SELECT("*");
+                FROM("person");
+                WHERE("name like #{name} || '%'");
+            }
+        }.toString();
+    }
+}

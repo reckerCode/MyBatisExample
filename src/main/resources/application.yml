@@ -1,0 +1,5 @@
+mybatis:
+  jdbc-driver: "org.h2.Driver"
+  db-url: "jdbc:h2:mem:testDB"
+  user: "sa"
+  pass: ""
